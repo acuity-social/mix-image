@@ -4,7 +4,8 @@
   "description": "App for publishing images on MIX.",
   "main": "backend.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "prestart": "browserify frontend.js -o public/bundle.js",
+    "start": "nodejs backend.js"
   },
   "repository": {
     "type": "git",
@@ -15,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/mix-blockchain/mix-image/issues"
   },
-  "homepage": "https://github.com/mix-blockchain/mix-image#readme"
+  "homepage": "https://github.com/mix-blockchain/mix-image#readme",
+  "dependencies": {
+    "express": "^4.16.2"
+  }
 }
