@@ -1,0 +1,19 @@
+{
+  "name": "mix-image",
+  "version": "1.0.0",
+  "description": "App for publishing images on MIX.",
+  "main": "backend.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mix-blockchain/mix-image.git"
+  },
+  "author": "Jonathan Brown <jbrown@mix-blockchain.org>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/mix-blockchain/mix-image/issues"
+  },
+  "homepage": "https://github.com/mix-blockchain/mix-image#readme"
+}
