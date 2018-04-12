@@ -1,9 +1,13 @@
 var $ = require("jquery");
 var jpeg = require('jpeg-js');
 const pica = require('pica')();
+const jpegMipmap = require("./mix_jpeg_mipmap_pb.js");
+const item = require("./item_pb.js");
+const brotli = require("./brotli.js");
+var bro = new brotli.Brotli();
 
 function scaleImage(rawImageData, width, height) {
-  pica.resizeBuffer({
+  return pica.resizeBuffer({
     src: rawImageData.data, 
     width: rawImageData.width, 
     height: rawImageData.height,
@@ -20,7 +24,7 @@ function scaleImage(rawImageData, width, height) {
     var uploadFormData = new FormData();
     uploadFormData.append("test.jpeg", new File([jpegImageData.data], {type:"application/octet-stream"}));
 
-    $.ajax({
+    return $.ajax({
       url: "http://127.0.0.1:5001/api/v0/add",
       method: "POST",
       data: uploadFormData,
@@ -31,7 +35,7 @@ function scaleImage(rawImageData, width, height) {
       dataType: "json"
     })
     .done(function(result) {
-      console.log(result);
+//      console.log(result);
     })
     .fail(function(jqXHR, textStatus, errorThrown) {
       console.log(textStatus);
@@ -64,6 +68,7 @@ $(function() {
       var reader = new FileReader();
       reader.onload = (function(event) {
         var rawImageData = jpeg.decode(event.target.result);
+        var mipmaps = [];
         
         var level = 1;
         do {
@@ -71,11 +76,34 @@ $(function() {
           var width = Math.floor(rawImageData.width / scale);
           var height = Math.floor(rawImageData.height / scale);
           console.log(level, width, height);
-          scaleImage(rawImageData, width, height);
+          mipmaps.push(scaleImage(rawImageData, width, height));
           level++;
         }
         while (width > 64 && height > 64);
         
+        Promise.all(mipmaps).then(mipmaps => {
+          var message = new jpegMipmap.JpegMipmap();
+          message.setWidth(rawImageData.width);
+          message.setHeight(rawImageData.height);
+          mipmaps.forEach(function(mipmap) {
+            message.addMipmaplevelfilesize(mipmap.Size);
+            message.addMipmaplevelipfshash(mipmap.Hash);
+          });
+          var mixinPayload = message.serializeBinary();
+
+          var mixinMessage = new item.Mixin();
+          mixinMessage.setMixinId(0);
+          mixinMessage.setPayload(mixinPayload);
+
+          var itemMessage = new item.Item();
+          itemMessage.addMixins(mixinMessage);
+
+          var itemPayload = itemMessage.serializeBinary();
+          console.log(itemPayload.length);
+
+          var output = bro.compressArray(itemPayload, 11);
+          console.log(output.length);
+        });
       });
       reader.readAsArrayBuffer(f);
     }
