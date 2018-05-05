@@ -116,7 +116,7 @@ $(function() {
           console.log(output.length);
 
 					var uploadFormData = new FormData();
-					uploadFormData.append("", new File([output], {type:"application/octet-stream"}));
+					uploadFormData.append("", new File([Buffer.from(output).toString('binary')], {type:"application/octet-stream"}));
 
 					return $.ajax({
 						url: "http://127.0.0.1:5001/api/v0/add",
