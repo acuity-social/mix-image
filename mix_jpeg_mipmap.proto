@@ -1,0 +1,12 @@
+/**
+ * Protocol Buffers schema for Mipmapped JPEG items.
+ */
+
+syntax = "proto3";
+
+message JpegMipmap {
+  uint32 width = 1;
+  uint32 height = 2;
+  repeated uint64 mipmapLevelFilesize = 3;
+  repeated bytes mipmapLevelIpfsHash = 4;
+}
