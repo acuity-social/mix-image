@@ -45,7 +45,7 @@ function scaleImage(rawImageData, width, height) {
       dataType: "json"
     })
     .done(function(result) {
-    	console.log(result.Hash);
+      console.log(result.Hash);
     })
     .fail(function(jqXHR, textStatus, errorThrown) {
       console.log(textStatus);
@@ -80,6 +80,28 @@ $(function() {
         var rawImageData = jpeg.decode(event.target.result);
         var mipmaps = [];
         
+
+        var uploadFormData = new FormData();
+        uploadFormData.append("", new File([event.target.result], {type:"application/octet-stream"}));
+
+        mipmaps.push($.ajax({
+          url: "http://127.0.0.1:5001/api/v0/add",
+          method: "POST",
+          data: uploadFormData,
+          cache: false,
+          processData: false, // Don't process the files
+          contentType: false,
+          mimeType: "application/json",
+          dataType: "json"
+        })
+        .done(function(result) {
+          console.log(result.Hash);
+        })
+        .fail(function(jqXHR, textStatus, errorThrown) {
+          console.log(textStatus);
+          console.log(errorThrown);
+        }));
+
         var level = 1;
         do {
           var scale = Math.pow(2, level);
@@ -146,7 +168,6 @@ $(function() {
 				    var itemId = itemStore.getNewItemId(flagsNonce);
 				    console.log(itemId);
 				    itemStore.create(flagsNonce, hashHex, {gas: 1000000});
-
 					})
 					.fail(function(jqXHR, textStatus, errorThrown) {
 						console.log(textStatus);
